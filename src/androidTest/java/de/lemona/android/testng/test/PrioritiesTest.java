@@ -3,9 +3,7 @@ package de.lemona.android.testng.test;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import de.lemona.android.testng.AbstractAndroidTest;
-
-public class PrioritiesTest extends AbstractAndroidTest {
+public class PrioritiesTest {
 
     private boolean firstCalled = false;
     private boolean secondCalled = false;
@@ -25,6 +23,5 @@ public class PrioritiesTest extends AbstractAndroidTest {
         Assert.assertTrue(firstCalled, "SimpleTest.myFirstTest() not called");
         Assert.assertTrue(secondCalled, "SimpleTest.mySecondTest() not called");
     }
-
 
 }

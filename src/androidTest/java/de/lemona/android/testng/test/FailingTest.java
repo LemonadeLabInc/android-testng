@@ -12,11 +12,11 @@ public class FailingTest {
 
     @Test(expectedExceptions=NullPointerException.class)
     public void expectedFailingTest() {
-        throw new NullPointerException();
+        throw new NullPointerException("This is expected");
     }
 
     @Test(enabled=false)
-    public void shouldBeSkipped() {
+    public void shouldBeSkippedAgain() {
         Assert.fail("This test should be skipped");
     }
 

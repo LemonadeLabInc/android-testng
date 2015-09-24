@@ -36,11 +36,26 @@ project.gradle.taskGraph.whenReady {
   }
 }
 
+// Remove our "guice" dependency from the POM
+afterEvaluate {
+  def _dependencies = publishing.publications.main.runtimeDependencies
+  _dependencies.each { _dep ->
+    if (_dep.groupId == 'com.google.inject') {
+      _dependencies.remove(_dep)
+    }
+  }
+}
+
 // Our dependencies
 dependencies {
   compile('org.testng:testng:6.8.21') {
    exclude group: 'com.beust', module: 'jcommander'
    exclude group: 'org.beanshell', module: 'bsh'
    exclude group: 'junit', module: 'junit'
+  }
+
+  compile('com.google.inject:guice:3.0:no_aop') {
+    exclude group: 'org.sonatype.sisu.inject', module: 'cglib'
+    exclude group: 'aopalliance', module: 'aopalliance'
   }
 }

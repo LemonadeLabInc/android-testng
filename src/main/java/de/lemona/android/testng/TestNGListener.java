@@ -19,6 +19,7 @@ import org.testng.ITestResult;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.os.Bundle;
+import android.util.Log;
 
 /**
  * A <i>TestNG</i> {@link ITestListener} sending status reports.
@@ -62,6 +63,7 @@ public class TestNGListener implements ITestListener,
     private final ConcurrentHashMap<String, AtomicInteger> tests;
     private final Instrumentation instrumentation;
     private final Bundle bundle;
+    private boolean started;
 
     /**
      * Create a new {@link TestNGListener} instance.
@@ -73,26 +75,36 @@ public class TestNGListener implements ITestListener,
         this.tests = new ConcurrentHashMap<String, AtomicInteger>();
         this.instrumentation = instrumentation;
         this.bundle = new Bundle();
+        this.started = false;
+
+        // Always set...
+        bundle.putString(REPORT_KEY_IDENTIFIER, REPORT_VALUE_ID);
     }
 
     /* ====================================================================== */
 
     private final void sendStatus(int status) {
         if (isClosed.compareAndSet(false, false)) {
-            // Log.d(TAG, "Sending " + status + ": " + bundle);
+            Log.d("TestNG", "Sending " + status + ": " + bundle);
             this.instrumentation.sendStatus(status, bundle);
         }
     }
 
     private final void sendStatus(int status, ITestResult result) {
-        final Throwable throwable = result.getThrowable();
+        sendStatus(status, result.getThrowable());
+    }
+
+    private final void sendStatus(int status, Throwable throwable) {
         if (throwable != null) {
             final StringWriter writer = new StringWriter();
             final PrintWriter printer = new PrintWriter(writer);
             throwable.printStackTrace(printer);
             printer.flush();
             writer.flush();
-            bundle.putString(REPORT_KEY_STACK, writer.toString());
+            final String trace = writer.toString()
+                                       .replaceAll("(?m)^[ \t]*\r?\n", "")
+                                       .trim();
+            bundle.putString(REPORT_KEY_STACK, trace);
         } else {
             bundle.remove(REPORT_KEY_STACK);
         }
@@ -120,44 +132,35 @@ public class TestNGListener implements ITestListener,
         }
     }
 
+    /** Report an unexpected failure in the tests */
+    void fail(String className, String testName, Throwable throwable) {
+        if (! started) bundle.putInt(REPORT_KEY_NUM_TOTAL, 1);
+
+        bundle.putInt(REPORT_KEY_NUM_CURRENT, testNumber.incrementAndGet());
+        bundle.putString(REPORT_KEY_NAME_CLASS, className);
+        bundle.putString(REPORT_KEY_NAME_TEST, testName);
+
+        sendStatus(REPORT_VALUE_RESULT_START);
+        sendStatus(REPORT_VALUE_RESULT_FAILURE, throwable);
+    }
+
     /* ====================================================================== */
 
     /**
      * Notify that we are about to start testing.
      *
-     * This method will setup the initial {@link Bundle} for notifications and
-     * inject {@link Instrumentation} instances into test classes extending the
-     * {@link AndroidInstrumentationTest} abstract class.
+     * This method will setup the initial {@link Bundle} for notifications.
      */
     @Override
     public void onStart(ITestContext context) {
-        context.setAttribute(Instrumentation.class.getName(), this.instrumentation);
+        this.started = true;
 
         final ITestNGMethod[] methods = context.getAllTestMethods();
 
-        bundle.putString(REPORT_KEY_IDENTIFIER, REPORT_VALUE_ID);
         if ((methods == null) || (methods.length < 1)) {
             bundle.putInt(REPORT_KEY_NUM_TOTAL, 0);
         } else {
             bundle.putInt(REPORT_KEY_NUM_TOTAL, methods.length);
-
-            // TODO: Set the instrumentation and context. We shouldn't be doing
-            // it here, but I really couldn't find anywhere else to hook this...
-            for (ITestNGMethod method: methods) {
-
-                // Get the instance...
-                final Object instance = method.getInstance();
-
-                // Inject instrumentation
-                if (instance instanceof AndroidInstrumentationTest) {
-                    ((AndroidInstrumentationTest) instance).injectInstrumentation(instrumentation);
-                }
-
-                // Inject target context
-                if (instance instanceof AndroidContextTest) {
-                    ((AndroidContextTest) instance).injectContext(instrumentation.getTargetContext());
-                }
-            }
         }
     }
 
@@ -240,5 +243,4 @@ public class TestNGListener implements ITestListener,
         this.onTestStart(result);
         this.onTestSkipped(result);
     }
-
 }

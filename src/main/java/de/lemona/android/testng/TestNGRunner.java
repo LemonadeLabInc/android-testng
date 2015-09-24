@@ -2,7 +2,6 @@ package de.lemona.android.testng;
 
 import static de.lemona.android.testng.TestNGLogger.TAG;
 
-import java.io.IOException;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -34,6 +33,7 @@ public class TestNGRunner extends Instrumentation {
     @Override
     public void onStart() {
         final TestNGListener listener = new TestNGListener(this);
+        AndroidTestNGSupport.injectInstrumentation(this);
 
         try {
             // Our XML suite for running tests
@@ -74,14 +74,14 @@ public class TestNGRunner extends Instrumentation {
             ng.setDefaultTestName("Android TestNG Test");
             ng.setCommandLineSuite(xmlSuite);
             ng.addListener(new TestNGLogger());
-            ng.addListener(listener); // reporter
+            ng.addListener((Object) listener);
 
             // Run tests!
             ng.runSuitesLocally();
 
-        } catch (IOException exception) {
-            // Wrap the IOException into something we can throw
-            throw new IllegalStateException("I/O error", exception);
+        } catch (Throwable throwable) {
+            Log.e(TAG, "An unexpected error occurred", throwable);
+            listener.fail(this.getClass().getName(), "onStart", throwable);
 
         } finally {
             // Close our listener

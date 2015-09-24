@@ -1,0 +1,46 @@
+// Import the Android plugin
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath 'com.android.tools.build:gradle:1.3.1'
+  }
+}
+
+// Group and version
+group = 'de.lemona.android'
+version = '1.0'
+
+// Shared configurations
+apply plugin: 'com.android.library'
+apply from: 'http://lemonadelabinc.github.io/gradle-snippets/android.gradle'
+apply from: 'http://lemonadelabinc.github.io/gradle-snippets/eclipse.gradle'
+apply from: 'http://lemonadelabinc.github.io/gradle-snippets/maven.gradle'
+
+// Android setup
+android {
+  compileSdkVersion 22
+  buildToolsVersion '22.0.1'
+
+  // Instrumentation runner defined here, we publish this...
+  defaultConfig {
+    testInstrumentationRunner 'de.lemona.android.testng.TestNGRunner'
+  }
+}
+
+// Ignore test failures, we have forced a couple of them
+project.gradle.taskGraph.whenReady {
+  connectedDebugAndroidTest {
+    ignoreFailures = true
+  }
+}
+
+// Our dependencies
+dependencies {
+  compile('org.testng:testng:6.8.21') {
+   exclude group: 'com.beust', module: 'jcommander'
+   exclude group: 'org.beanshell', module: 'bsh'
+   exclude group: 'junit', module: 'junit'
+  }
+}

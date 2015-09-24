@@ -5,13 +5,10 @@ import static de.lemona.android.testng.test.LifecycleTest.EVENTS;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import android.util.Log;
-
 public class LivecycleTestVerifier {
 
     @Test(dependsOnGroups="Lifecycle")
     public void verifyLifecycle() {
-        Log.i("TestNG", EVENTS.toString());
         Assert.assertEquals(EVENTS.size(), 12, LifecycleTest.EVENTS.toString());
         Assert.assertEquals(EVENTS.get( 0), "BEFORE_SUITE");
         Assert.assertEquals(EVENTS.get( 1), "BEFORE_TEST");

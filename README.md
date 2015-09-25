@@ -58,13 +58,15 @@ package.
 Contexts
 --------
 
-Simply implement the
-[AndroidContextTest](src/main/java/de/lemona/android/testng/AndroidContextTest.java)
-interface or extend the
-[AbstractAndroidTest](src/main/java/de/lemona/android/testng/AbstractAndroidTest.java)
-abstract class in order to access the Android's
+In order to have access to the Android's application
 [Context](http://developer.android.com/reference/android/content/Context.html)
-instance for the running app.
+please refer to the [`AndroidTestNGSupport`](src/main/java/de/lemona/android/testng/AndroidTestNGSupport.java)
+utility class. The two static `getContext()` and `getInstrumentation()` methods
+allow retrieval of the instances.
+
+[Google Guice](https://github.com/google/guice) injection is also supported. Take a look at the 
+[GuiceInjectionTest](src/androidTest/java/de/lemona/android/testng/test/GuiceInjectionTest.java)
+for an example of how to configure your tests.
 
 
 License

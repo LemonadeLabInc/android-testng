@@ -2,9 +2,11 @@
 buildscript {
   repositories {
     mavenCentral()
+    jcenter()
   }
   dependencies {
     classpath 'com.android.tools.build:gradle:1.3.1'
+    classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.3.1'
   }
 }
 
@@ -12,8 +14,11 @@ buildscript {
 group = 'de.lemona.android'
 version = '1.1'
 
-// Shared configurations
+// Local plugins
 apply plugin: 'com.android.library'
+apply plugin: 'com.jfrog.bintray'
+
+// Shared configurations
 apply from: 'http://lemonadelabinc.github.io/gradle-snippets/android.gradle'
 apply from: 'http://lemonadelabinc.github.io/gradle-snippets/eclipse.gradle'
 apply from: 'http://lemonadelabinc.github.io/gradle-snippets/maven.gradle'
@@ -57,5 +62,33 @@ dependencies {
   compile('com.google.inject:guice:3.0:no_aop') {
     exclude group: 'org.sonatype.sisu.inject', module: 'cglib'
     exclude group: 'aopalliance', module: 'aopalliance'
+  }
+}
+
+/* ========================================================================== */
+/* Publish to Bintray if we have to                                           */
+/* ========================================================================== */
+
+def _bintrayUser  = System.getenv("BINTRAY_USER")
+def _bintrayKey   = System.getenv("BINTRAY_KEY")
+
+if ((_bintrayUser == null) && hasProperty('bintray.user')) _bintrayUser = ext['bintray.user']
+if ((_bintrayKey  == null) && hasProperty('bintray.key'))  _bintrayKey  = ext['bintray.key']
+
+if ((_bintrayUser != null) && (_bintrayKey != null)) {
+  def _version = version // save for the closure below
+  bintray {
+    user = _bintrayUser
+    key = _bintrayKey
+    publications = ['main']
+    publish = true
+    pkg {
+      repo = 'maven'
+      name = 'android-testng'
+      userOrg = 'lemonade'
+      licenses = ['Apache-2.0']
+      vcsUrl = 'https://github.com/LemonadeLabInc/android-testng/'
+      version { name = _version }
+    }
   }
 }

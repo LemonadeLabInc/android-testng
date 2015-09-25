@@ -15,6 +15,13 @@ should be limited to adding our repository, and dependency and modifying
 your `testInstrumentationRunner`:
 
 ```groovy
+// Our Bintray repository
+repositories {
+  maven {
+    url 'http://dl.bintray.com/lemonade/maven'
+  }
+}
+
 // TestNG dependency
 dependencies {
   androidTestCompile 'de.lemona.android:testng:1.0.0'

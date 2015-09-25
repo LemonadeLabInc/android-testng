@@ -5,14 +5,15 @@ This is a minimal implementation of an Android
 [Instrumentation](http://developer.android.com/reference/android/app/Instrumentation.html)
 executing unit tests based on [TestNG](http://testng.org/) (the best testing framework for Java).
 
+[![Download](https://api.bintray.com/packages/lemonade/maven/android-testng/images/download.svg) ](https://bintray.com/lemonade/maven/android-testng/_latestVersion)
 
 Usage
 -----
 
 Depending on your build system, your mileage might vary, but with
 [Gradle](https://gradle.org/) the only required changes to your build files
-should be limited to adding our repository, and dependency and modifying
-your `testInstrumentationRunner`:
+should be limited to adding our [repository](https://bintray.com/lemonade/maven),
+then declaring the dependency and modifying your `testInstrumentationRunner`:
 
 ```groovy
 // Our Bintray repository
@@ -22,9 +23,9 @@ repositories {
   }
 }
 
-// TestNG dependency
+// TestNG dependency, remember to update to the latest version
 dependencies {
-  androidTestCompile 'de.lemona.android:testng:1.0.0'
+  androidTestCompile 'de.lemona.android:testng:X.Y.Z'
 }
 
 // Android setup

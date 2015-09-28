@@ -30,6 +30,8 @@ android {
 
   // Instrumentation runner defined here, we publish this...
   defaultConfig {
+    minSdkVersion 22
+    targetSdkVersion 22
     testInstrumentationRunner 'de.lemona.android.testng.TestNGRunner'
   }
 }
@@ -41,25 +43,23 @@ project.gradle.taskGraph.whenReady {
   }
 }
 
-// Remove our "guice" dependency from the POM
-afterEvaluate {
-  def _dependencies = publishing.publications.main.runtimeDependencies
-  _dependencies.each { _dep ->
-    if (_dep.groupId == 'com.google.inject') {
-      _dependencies.remove(_dep)
-    }
-  }
-}
-
 // Our dependencies
 dependencies {
+
+  // Depend on TestNG (obviously)
   compile('org.testng:testng:6.8.21') {
    exclude group: 'com.beust', module: 'jcommander'
    exclude group: 'org.beanshell', module: 'bsh'
    exclude group: 'junit', module: 'junit'
   }
 
-  compile('com.google.inject:guice:3.0:no_aop') {
+  // Guice required for compilation (provided) and test
+  provided('com.google.inject:guice:3.0:no_aop') {
+    exclude group: 'org.sonatype.sisu.inject', module: 'cglib'
+    exclude group: 'aopalliance', module: 'aopalliance'
+  }
+
+  androidTestCompile('com.google.inject:guice:3.0:no_aop') {
     exclude group: 'org.sonatype.sisu.inject', module: 'cglib'
     exclude group: 'aopalliance', module: 'aopalliance'
   }

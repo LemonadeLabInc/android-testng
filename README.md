@@ -25,7 +25,7 @@ repositories {
 
 // TestNG dependency, remember to update to the latest version
 dependencies {
-  androidTestCompile 'de.lemona.android:testng:X.Y.Z'
+  androidTestCompile 'de.lemona.android:android-testng:X.Y.Z'
 }
 
 // Android setup

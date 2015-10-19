@@ -12,7 +12,7 @@ buildscript {
 
 // Group and version
 group = 'de.lemona.android'
-version = '1.0'
+version = '1.1'
 
 // Local plugins
 apply plugin: 'com.android.library'

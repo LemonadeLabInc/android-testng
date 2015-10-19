@@ -2,11 +2,14 @@ package de.lemona.android.testng;
 
 import static de.lemona.android.testng.TestNGLogger.TAG;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.List;
 
 import org.testng.TestNG;
 import org.testng.collections.Lists;
+import org.testng.xml.Parser;
 import org.testng.xml.XmlClass;
 import org.testng.xml.XmlSuite;
 import org.testng.xml.XmlTest;
@@ -35,9 +38,25 @@ public class TestNGRunner extends Instrumentation {
         final TestNGListener listener = new TestNGListener(this);
         AndroidTestNGSupport.injectInstrumentation(this);
 
+        final TestNG ng = new TestNG(false);
+        ng.setDefaultSuiteName("Android TestNG Suite");
+        ng.setDefaultTestName("Android TestNG Test");
+
+        // Try to load "testng.xml" from the assets directory...
+        try {
+            final InputStream input = this.getContext().getAssets().open("testng.xml");
+            if (input != null) ng.setXmlSuites(new Parser(input).parseToList());
+        } catch (final FileNotFoundException exception) {
+            Log.d(TAG, "The \"testng.xml\" file was not found in assets");
+        } catch (final Throwable throwable) {
+            Log.e(TAG, "An unexpected error occurred parsing \"testng.xml\"", throwable);
+            listener.fail(this.getClass().getName(), "onStart", throwable);
+        }
+
         try {
             // Our XML suite for running tests
             final XmlSuite xmlSuite = new XmlSuite();
+
             xmlSuite.setVerbose(0);
             xmlSuite.setJUnit(false);
             xmlSuite.setName(targetPackage);
@@ -59,28 +78,32 @@ public class TestNGRunner extends Instrumentation {
 
                 try {
                     xmlClasses.add(new XmlClass(cls, true));
-                } catch (Throwable throwable) {
+                } catch (final Throwable throwable) {
                     // Likely NoClassDefException for missing dependencies
                     Log.w(TAG, "Ignoring class " + cls, throwable);
                 }
             }
 
-            // Remember our classes
-            xmlTest.setXmlClasses(xmlClasses);
+            // Remember our classes if we have to
+            if (! xmlClasses.isEmpty()) {
+                Log.i(TAG, "Adding suite from package \"" + targetPackage + "\"");
+                xmlTest.setXmlClasses(xmlClasses);
+                ng.setCommandLineSuite(xmlSuite);
+            }
 
-            // Create our TestNG runner
-            final TestNG ng = new TestNG(false);
-            ng.setDefaultSuiteName("Android TestNG Suite");
-            ng.setDefaultTestName("Android TestNG Test");
-            ng.setCommandLineSuite(xmlSuite);
+        } catch (final Throwable throwable) {
+            Log.e(TAG, "An unexpected error occurred analysing package \"" + targetPackage + "\"", throwable);
+            listener.fail(this.getClass().getName(), "onStart", throwable);
+        }
+
+        // Run tests!
+        try {
             ng.addListener(new TestNGLogger());
             ng.addListener((Object) listener);
-
-            // Run tests!
             ng.runSuitesLocally();
 
-        } catch (Throwable throwable) {
-            Log.e(TAG, "An unexpected error occurred", throwable);
+        } catch (final Throwable throwable) {
+            Log.e(TAG, "An unexpected error occurred running tests", throwable);
             listener.fail(this.getClass().getName(), "onStart", throwable);
 
         } finally {

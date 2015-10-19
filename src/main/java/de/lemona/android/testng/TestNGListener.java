@@ -166,7 +166,8 @@ public class TestNGListener implements ITestListener,
 
     @Override
     public void onFinish(ITestContext context) {
-        close();
+        // Let this be closed by the instrumentation runner for when
+        // there are multiple suites (e.g. from "testng.xml" in assets)
     }
 
     /* ====================================================================== */

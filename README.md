@@ -55,6 +55,22 @@ it, all our tests will be automatically searched for in the
 package.
 
 
+XML Suites
+----------
+
+Test suites can also be defined using a [`testng.xml`](http://testng.org/doc/documentation-main.html#testng-xml)
+file from your [`assets`](src/androidTest/assets) directory.
+
+This is useful when tests do not reside in the standard application package
+plus `....test`.
+
+One caveat, though, is that the `<package />` element does not work _(yet)_,
+as TestNG expects JAR files, while Android bundles everything into a DAX file.
+
+For an example see the [`testng.xml`](src/androidTest/assets/testng.xml) file
+included alongside these sources.
+
+
 Contexts
 --------
 
@@ -64,7 +80,7 @@ please refer to the [`AndroidTestNGSupport`](src/main/java/de/lemona/android/tes
 utility class. The two static `getContext()` and `getInstrumentation()` methods
 allow retrieval of the instances.
 
-[Google Guice](https://github.com/google/guice) injection is also supported. Take a look at the 
+[Google Guice](https://github.com/google/guice) injection is also supported. Take a look at the
 [GuiceInjectionTest](src/androidTest/java/de/lemona/android/testng/test/GuiceInjectionTest.java)
 for an example of how to configure your tests.
 

@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="Simple Suite">
+  <test name="Simple Test">
+    <classes>
+      <class name="de.lemona.android.testng.others.TestFromXMLFile"/>
+    </classes>
+  </test>
+</suite>

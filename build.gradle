@@ -9,7 +9,7 @@ buildscript {
 }
 
 plugins {
-  id 'de.lemona.gradle' version '0.0.0'
+  id 'de.lemona.gradle' version '0.0.1'
   id 'com.jfrog.bintray' version '1.3.1'
 }
 

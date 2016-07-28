@@ -1,11 +1,8 @@
 package de.lemona.android.testng;
 
-import static de.lemona.android.testng.TestNGLogger.TAG;
-
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.Enumeration;
-import java.util.List;
+import android.app.Instrumentation;
+import android.os.Bundle;
+import android.util.Log;
 
 import org.testng.TestNG;
 import org.testng.collections.Lists;
@@ -14,10 +11,14 @@ import org.testng.xml.XmlClass;
 import org.testng.xml.XmlSuite;
 import org.testng.xml.XmlTest;
 
-import android.app.Instrumentation;
-import android.os.Bundle;
-import android.util.Log;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.Enumeration;
+import java.util.List;
+
 import dalvik.system.DexFile;
+
+import static de.lemona.android.testng.TestNGLogger.TAG;
 
 /**
  * The root of all evil, creating a TestNG {@link XmlSuite} and running it.
@@ -25,12 +26,19 @@ import dalvik.system.DexFile;
 public class TestNGRunner extends Instrumentation {
 
     private String targetPackage = null;
+    private TestNGArgs args;
 
     @Override
     public void onCreate(Bundle arguments) {
         super.onCreate(arguments);
+        args = parseRunnerArgument(arguments);
         targetPackage = this.getTargetContext().getPackageName();
         this.start();
+    }
+
+    private TestNGArgs parseRunnerArgument(Bundle arguments) {
+        TestNGArgs.Builder builder = new TestNGArgs.Builder(this).fromBundle(arguments);
+        return builder.build();
     }
 
     @Override
@@ -99,6 +107,9 @@ public class TestNGRunner extends Instrumentation {
         // Run tests!
         try {
             ng.addListener(new TestNGLogger());
+            if (args.codeCoverage) {
+                ng.addListener(new TestNGCoverageListener(this, args.codeCoveragePath));
+            }
             ng.addListener((Object) listener);
             ng.runSuitesLocally();
 

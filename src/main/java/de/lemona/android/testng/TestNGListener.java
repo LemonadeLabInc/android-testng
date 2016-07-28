@@ -1,13 +1,9 @@
 package de.lemona.android.testng;
 
-import static android.app.Instrumentation.REPORT_KEY_IDENTIFIER;
-
-import java.io.Closeable;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+import android.app.Activity;
+import android.app.Instrumentation;
+import android.os.Bundle;
+import android.util.Log;
 
 import org.testng.IConfigurationListener;
 import org.testng.IExecutionListener;
@@ -16,10 +12,14 @@ import org.testng.ITestListener;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 
-import android.app.Activity;
-import android.app.Instrumentation;
-import android.os.Bundle;
-import android.util.Log;
+import java.io.Closeable;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static android.app.Instrumentation.REPORT_KEY_IDENTIFIER;
 
 /**
  * A <i>TestNG</i> {@link ITestListener} sending status reports.
@@ -72,7 +72,7 @@ public class TestNGListener implements ITestListener,
      */
     protected TestNGListener(Instrumentation instrumentation) {
         if (instrumentation == null) throw new NullPointerException();
-        this.tests = new ConcurrentHashMap<String, AtomicInteger>();
+        this.tests = new ConcurrentHashMap<>();
         this.instrumentation = instrumentation;
         this.bundle = new Bundle();
         this.started = false;
@@ -149,7 +149,7 @@ public class TestNGListener implements ITestListener,
     /**
      * Notify that we are about to start testing.
      *
-     * This method will setup the initial {@link Bundle} for notifications.
+         * This method will setup the initial {@link Bundle} for notifications.
      */
     @Override
     public void onStart(ITestContext context) {

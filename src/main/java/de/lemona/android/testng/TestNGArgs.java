@@ -12,7 +12,7 @@ import java.io.File;
 public class TestNGArgs {
 
     /* ARGUMENT KEYS */
-
+    static final String ARGUMENT_DEBUG = "debug";
     static final String ARGUMENT_COVERAGE = "coverage";
     static final String ARGUMENT_COVERAGE_PATH = "coverageFile";
 
@@ -21,10 +21,12 @@ public class TestNGArgs {
     private static final String DEFAULT_COVERAGE_FILE_NAME = "coverage.ec";
 
 
+    public final boolean debug;
     public final boolean codeCoverage;
     public final String codeCoveragePath;
 
     private TestNGArgs(Builder builder) {
+        this.debug = builder.debug;
         this.codeCoverage = builder.codeCoverage;
         this.codeCoveragePath = builder.codeCoveragePath;
 
@@ -33,6 +35,7 @@ public class TestNGArgs {
 
     public static class Builder {
         private final Instrumentation instrumentation;
+        private boolean debug = false;
         private boolean codeCoverage = false;
         private String codeCoveragePath = null;
 
@@ -41,6 +44,7 @@ public class TestNGArgs {
         }
 
         public Builder fromBundle(Bundle bundle) {
+            debug = parseBoolean(bundle.getString(ARGUMENT_DEBUG));
             codeCoverage = parseBoolean(bundle.getString(ARGUMENT_COVERAGE));
             codeCoveragePath = bundle.getString(ARGUMENT_COVERAGE_PATH);
             if (codeCoverage && codeCoveragePath == null) {
@@ -68,6 +72,7 @@ public class TestNGArgs {
 
     public String toString() {
         return "[" + TestNGArgs.class.getSimpleName() + "]" +
+                "debug = " + debug + "\n" +
                 "codeCoverage = " + codeCoverage + "\n" +
                 "codeCoveragePath = " + codeCoveragePath;
     }

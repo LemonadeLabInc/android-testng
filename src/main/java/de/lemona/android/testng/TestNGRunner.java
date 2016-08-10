@@ -2,6 +2,7 @@ package de.lemona.android.testng;
 
 import android.app.Instrumentation;
 import android.os.Bundle;
+import android.os.Debug;
 import android.util.Log;
 
 import org.testng.TestNG;
@@ -45,6 +46,15 @@ public class TestNGRunner extends Instrumentation {
     public void onStart() {
         final TestNGListener listener = new TestNGListener(this);
         AndroidTestNGSupport.injectInstrumentation(this);
+
+        if (args.debug) {
+            // waitForDebugger
+            Log.d(TAG, "waiting for debugger...");
+            Debug.waitForDebugger();
+            Log.d(TAG, "debugger was connected.");
+        }
+
+        setupDexmakerClassloader();
 
         final TestNG ng = new TestNG(false);
         ng.setDefaultSuiteName("Android TestNG Suite");
@@ -121,5 +131,15 @@ public class TestNGRunner extends Instrumentation {
             // Close our listener
             listener.close();
         }
+    }
+
+    private void setupDexmakerClassloader() {
+        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
+        // must set the context classloader for apps that use a shared uid, see
+        // frameworks/base/core/java/android/app/LoadedApk.java
+        ClassLoader newClassLoader = this.getClass().getClassLoader();
+        //Log.i(LOG_TAG, String.format("Setting context classloader to '%s', Original: '%s'",
+        //        newClassLoader.toString(), originalClassLoader.toString()));
+        Thread.currentThread().setContextClassLoader(newClassLoader);
     }
 }

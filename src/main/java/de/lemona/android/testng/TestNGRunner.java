@@ -38,6 +38,11 @@ public class TestNGRunner extends Instrumentation {
     }
 
     private TestNGArgs parseRunnerArgument(Bundle arguments) {
+        Log.d(TAG, "DEBUG arguments");
+        for (String key : arguments.keySet()) {
+            Log.d(TAG, "key " + key + " = " + arguments.get(key));
+        }
+        Log.d(TAG, "DEBUG argumetns END");
         TestNGArgs.Builder builder = new TestNGArgs.Builder(this).fromBundle(arguments);
         return builder.build();
     }

@@ -71,10 +71,10 @@ public class TestNGArgs {
     }
 
     public String toString() {
-        return "[" + TestNGArgs.class.getSimpleName() + "]" +
-                "debug = " + debug + "\n" +
-                "codeCoverage = " + codeCoverage + "\n" +
-                "codeCoveragePath = " + codeCoveragePath;
+        return "[" + TestNGArgs.class.getSimpleName() + "]\n" +
+                "\tdebug = " + debug + "\n" +
+                "\tcodeCoverage = " + codeCoverage + "\n" +
+                "\tcodeCoveragePath = " + codeCoveragePath;
     }
 
 }

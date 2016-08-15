@@ -12,9 +12,9 @@ import java.io.File;
 public class TestNGArgs {
 
     /* ARGUMENT KEYS */
-    static final String ARGUMENT_DEBUG = "debug";
-    static final String ARGUMENT_COVERAGE = "coverage";
-    static final String ARGUMENT_COVERAGE_PATH = "coverageFile";
+    public static final String ARGUMENT_DEBUG = "debug";
+    public static final String ARGUMENT_COVERAGE = "coverage";
+    public static final String ARGUMENT_COVERAGE_PATH = "coverageFile";
 
     /* Default Values */
 

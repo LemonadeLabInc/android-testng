@@ -88,12 +88,13 @@ for an example of how to configure your tests.
 Options
 --------
 
-The parameters to enable Debugger on testing are same as [adb instrument](https://developer.android.com/studio/test/command-line.html)
+The options to enable some features on testing are same as [adb instrument](https://developer.android.com/studio/test/command-line.html)
 Current supported options are as below
 - debug
 - coverage
 - coverageFile
 
+If you need to run tests from Android Studio, please use [Android Tests](https://www.jetbrains.com/help/idea/2016.1/run-debug-configuration-android-test.html) Configuration.
 
 License
 -------

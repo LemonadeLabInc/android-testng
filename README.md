@@ -85,6 +85,16 @@ allow retrieval of the instances.
 for an example of how to configure your tests.
 
 
+Features
+--------
+
+The parameters to enable Debugger on testing are same as [adb instrument](https://developer.android.com/studio/test/command-line.html)
+Current supported options are as below
+- debug
+- coverage
+- coverageFile
+
+
 License
 -------
 

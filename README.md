@@ -88,8 +88,7 @@ for an example of how to configure your tests.
 Options
 --------
 
-The options to enable some features on testing are same as [adb instrument](https://developer.android.com/studio/test/command-line.html)
-Current supported options are as below
+The options to enable some features on testing are same as [adb instrument](https://developer.android.com/studio/test/command-line.html). Current supported options are as below:
 - debug
 - coverage
 - coverageFile

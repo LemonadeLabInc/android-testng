@@ -93,7 +93,32 @@ The options to enable some features on testing are same as [adb instrument](http
 - coverage
 - coverageFile
 
-If you need to run tests from Android Studio, please use [Android Tests](https://www.jetbrains.com/help/idea/2016.1/run-debug-configuration-android-test.html) Configuration.
+If you need to run tests from Android Studio, please use [Android Tests](https://www.jetbrains.com/help/idea/2016.1/run-debug-configuration-android-test.html) Configuration. Running the following Gradle tasks from Android Studio will typically work with these tests, where YourBuildName is your build name in camel-case:
+
+ - :build
+ - :installYourBuildNameAndroidTest
+ - :connectedYourBuildNameAndroidTest
+
+Compatability with Android UI testing frameworks
+------------------------------------------------
+
+This framework has been tested to be fully compatable with the UIAutomator framework; just make sure to import the AndroidTestNGSupport class' getInstrumentation() and getContext() methods. It's also compatable with the Espresso framework. Make sure to set up your Espresso tests with methods such as the following (this is just the code I got to work; it may be suboptimal!):
+
+    @Inject
+    public YourTestNameHere(Instrumentation instrumentation) {
+        this.mInstrumentation = instrumentation;
+    }
+
+    @BeforeTest
+    public void setUp() {
+        InstrumentationRegistry.registerInstance(mInstrumentation,
+                new Bundle());
+        Intent intent = new Intent(getContext(), YourAppActivityNameHere.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mActivity = YourAppActivityNameHere.class.cast(mInstrumentation.startActivitySync(intent));
+        mInstrumentation.waitForIdleSync();
+    }
+
 
 License
 -------

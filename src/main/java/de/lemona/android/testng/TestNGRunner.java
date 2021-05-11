@@ -1,6 +1,10 @@
 package de.lemona.android.testng;
 
 import android.app.Instrumentation;
+import android.app.Activity;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
+import android.support.test.runner.lifecycle.Stage;
 import android.os.Bundle;
 import android.os.Debug;
 import android.util.Log;
@@ -16,6 +20,8 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.EnumSet;
 
 import dalvik.system.DexFile;
 
@@ -27,11 +33,15 @@ import static de.lemona.android.testng.TestNGLogger.TAG;
 public class TestNGRunner extends Instrumentation {
 
     private String targetPackage = null;
+    private ActivityLifecycleMonitorImpl mLifecycleMonitor = new ActivityLifecycleMonitorImpl();
     private TestNGArgs args;
 
     @Override
     public void onCreate(Bundle arguments) {
         super.onCreate(arguments);
+        InstrumentationRegistry.registerInstance(this, arguments);
+        ActivityLifecycleMonitorRegistry.registerInstance(mLifecycleMonitor);
+
         args = parseRunnerArgument(arguments);
         targetPackage = this.getTargetContext().getPackageName();
         this.start();
@@ -138,6 +148,13 @@ public class TestNGRunner extends Instrumentation {
         }
     }
 
+    @Override
+    public void finish(int resultCode, Bundle results)  {
+        finishActivities();
+        ActivityLifecycleMonitorRegistry.registerInstance(null);
+        super.finish(resultCode, results);
+    }
+
     private void setupDexmakerClassloader() {
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         // must set the context classloader for apps that use a shared uid, see
@@ -146,5 +163,71 @@ public class TestNGRunner extends Instrumentation {
         //Log.i(LOG_TAG, String.format("Setting context classloader to '%s', Original: '%s'",
         //        newClassLoader.toString(), originalClassLoader.toString()));
         Thread.currentThread().setContextClassLoader(newClassLoader);
+    }
+    @Override
+    public void callActivityOnDestroy(Activity activity) {
+        super.callActivityOnDestroy(activity);
+        mLifecycleMonitor.signalLifecycleChange(Stage.DESTROYED, activity);
+    }
+
+    @Override
+    public void callActivityOnRestart(Activity activity) {
+        super.callActivityOnRestart(activity);
+        mLifecycleMonitor.signalLifecycleChange(Stage.RESTARTED, activity);
+    }
+
+    @Override
+    public void callActivityOnCreate(Activity activity, Bundle bundle) {
+        mLifecycleMonitor.signalLifecycleChange(Stage.PRE_ON_CREATE, activity);
+        super.callActivityOnCreate(activity, bundle);
+        mLifecycleMonitor.signalLifecycleChange(Stage.CREATED, activity);
+    }
+
+    @Override
+    public void callActivityOnStart(Activity activity) {
+        try {
+            super.callActivityOnStart(activity);
+            mLifecycleMonitor.signalLifecycleChange(Stage.STARTED, activity);
+        } catch (RuntimeException re) {
+            throw re;
+        }
+    }
+
+    @Override
+    public void callActivityOnStop(Activity activity) {
+        super.callActivityOnStop(activity);
+        mLifecycleMonitor.signalLifecycleChange(Stage.STOPPED, activity);
+    }
+
+    @Override
+    public void callActivityOnResume(Activity activity) {
+        super.callActivityOnResume(activity);
+        mLifecycleMonitor.signalLifecycleChange(Stage.RESUMED, activity);
+    }
+
+    @Override
+    public void callActivityOnPause(Activity activity) {
+        super.callActivityOnPause(activity);
+        mLifecycleMonitor.signalLifecycleChange(Stage.PAUSED, activity);
+    }
+
+    private void finishActivities() {
+        List<Activity> activities = new ArrayList<Activity>();
+
+        for (Stage s : EnumSet.range(Stage.CREATED, Stage.PAUSED)) {
+            activities.addAll(mLifecycleMonitor.getActivitiesInStage(s));
+        }
+
+        Log.i(TAG, "Activities that are still in CREATED to PAUSED: " + activities.size());
+        for (Activity activity : activities) {
+            if (!activity.isFinishing()) {
+                try {
+                    Log.i(TAG, "Stopping activity: " + activity);
+                    activity.finish();
+                } catch (RuntimeException e) {
+                    Log.e(TAG, "Failed to stop activity.", e);
+                }
+            }
+        }
     }
 }

@@ -7,7 +7,12 @@ public class FailingTest {
 
     @Test
     public void failingTest() {
-        Assert.fail("This is an expected failure for an @Test method");
+        try {
+            Assert.fail("This is an expected failure for an @Test method");
+            throw new RuntimeException("This should not be thrown."); // if assertion is failed, NullPointerException caused a failure of test.
+        } catch (AssertionError ae) {
+            // success
+        }
     }
 
     @Test(expectedExceptions=NullPointerException.class)

@@ -1,9 +1,8 @@
 package de.lemona.android.testng.test;
 
+import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
-import junit.framework.Assert;
 
 public class DataProviderTest {
 

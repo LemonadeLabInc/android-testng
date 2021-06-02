@@ -5,8 +5,7 @@ import android.os.Bundle;
 
 import com.google.inject.Inject;
 
-import junit.framework.Assert;
-
+import org.testng.Assert;
 import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
 
@@ -42,9 +41,9 @@ public class TestNGArgsTest {
         TestNGArgs.Builder builder = new TestNGArgs.Builder(instrumentation);
         builder = builder.fromBundle(bundle);
         TestNGArgs testNGArgs = builder.build();
-        Assert.assertTrue("argument should be true", testNGArgs.debug);
-        Assert.assertTrue("argument should be true", testNGArgs.codeCoverage);
-        Assert.assertEquals("argument should be received", testNGArgs.codeCoveragePath, "somewhere");
+        Assert.assertTrue(testNGArgs.debug, "argument should be true");
+        Assert.assertTrue(testNGArgs.codeCoverage, "argument should be true");
+        Assert.assertEquals("somewhere", testNGArgs.codeCoveragePath, "argument should be received");
 
         args.put(TestNGArgs.ARGUMENT_DEBUG, "false");
         args.put(TestNGArgs.ARGUMENT_COVERAGE,"false");
@@ -53,9 +52,9 @@ public class TestNGArgsTest {
         bundle = getTestArguments(args);
         builder = builder.fromBundle(bundle);
         TestNGArgs testNGArgs2 = builder.build();
-        Assert.assertFalse("argument should be false", testNGArgs2.debug);
-        Assert.assertFalse("argument should be false", testNGArgs2.codeCoverage);
-        Assert.assertNull("argument should be null", testNGArgs2.codeCoveragePath);
+        Assert.assertFalse(testNGArgs2.debug, "argument should be false");
+        Assert.assertFalse(testNGArgs2.codeCoverage,"argument should be false");
+        Assert.assertNull(testNGArgs2.codeCoveragePath, "argument should be null");
     }
 
 

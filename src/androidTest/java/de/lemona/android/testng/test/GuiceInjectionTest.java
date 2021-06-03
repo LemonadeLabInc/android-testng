@@ -1,13 +1,14 @@
 package de.lemona.android.testng.test;
 
-import javax.inject.Inject;
-
 import org.testng.Assert;
 import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
 
 import android.app.Instrumentation;
 import android.content.Context;
+
+import com.google.inject.Inject;
+
 import de.lemona.android.testng.AndroidTestNGModule;
 
 @Guice(modules=AndroidTestNGModule.class)

@@ -1,10 +1,11 @@
 package de.lemona.android.testng;
 
-import com.google.inject.Binder;
-import com.google.inject.Module;
-
 import android.app.Instrumentation;
 import android.content.Context;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Binder;
+import com.google.inject.Module;
 
 /**
  * A basic {@link Module} which can be used to inject {@link Context} and
@@ -20,7 +21,7 @@ import android.content.Context;
  *  }
  * </pre>
  */
-public class AndroidTestNGModule implements Module {
+public class AndroidTestNGModule extends AbstractModule {
 
     /**
      * Create a new {@link Module} binding {@link Context} and
@@ -34,7 +35,8 @@ public class AndroidTestNGModule implements Module {
      * Bind the {@link Context} and {@link Instrumentation} instances.
      */
     @Override
-    public void configure(Binder binder) {
+    public void configure() {
+        Binder binder = binder();
         binder.bind(Context.class).toInstance(AndroidTestNGSupport.getContext());
         binder.bind(Instrumentation.class).toInstance(AndroidTestNGSupport.getInstrumentation());
     }
